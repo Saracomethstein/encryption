@@ -22,6 +22,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("./ui")))
 
 	http.HandleFunc("/api/encrypt", encryptHandler)
+
 	http.HandleFunc("/api/decrypt", decryptHandler)
 
 	log.Println("Starting server on :8000")
@@ -34,8 +35,18 @@ func encryptHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	var result string
 
-	result := encrypt(req.Text, req.Hash)
+	switch req.Hash {
+	case "sha256":
+		result = encrypt256(req.Text)
+	case "sha384":
+		result = encrypt384(req.Text)
+	case "sha512":
+		result = encrypt512(req.Text)
+	default:
+		result = "Unknown hash type"
+	}
 
 	res := Response{Result: result}
 	json.NewEncoder(w).Encode(res)
@@ -53,20 +64,17 @@ func decryptHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-func encrypt(promt string, hashType string) string {
-	var result string
-	switch hashType {
-	case "sha256":
-		hash := sha256.Sum256([]byte(promt))
-		result = fmt.Sprintf("%x", hash)
-	case "sha384":
-		hash := sha512.Sum384([]byte(promt))
-		result = fmt.Sprintf("%x", hash)
-	case "sha512":
-		hash := sha512.Sum512([]byte(promt))
-		result = fmt.Sprintf("%x", hash)
-	default:
-		result = "Unknown hash type"
-	}
-	return result
+func encrypt256(promt string) string {
+	hash := sha256.Sum256([]byte(promt))
+	return fmt.Sprintf("%x", hash)
+}
+
+func encrypt384(promt string) string {
+	hash := sha512.Sum384([]byte(promt))
+	return fmt.Sprintf("%x", hash)
+}
+
+func encrypt512(promt string) string {
+	hash := sha512.Sum512([]byte(promt))
+	return fmt.Sprintf("%x", hash)
 }
