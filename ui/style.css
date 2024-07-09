@@ -20,8 +20,13 @@ body {
     cursor: pointer;
 }
 
-.func-button.active, .hash-button.active {
+.func-button.active {
     background-color: blue;
+    color: white;
+}
+
+.hash-button.active {
+    background-color: rgb(98, 0, 255);
     color: white;
 }
 
