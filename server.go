@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -34,7 +35,7 @@ func encryptHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := encrypt(req.Text)
+	result := encrypt(req.Text, req.Hash)
 
 	res := Response{Result: result}
 	json.NewEncoder(w).Encode(res)
@@ -52,7 +53,20 @@ func decryptHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-func encrypt(promt string) string {
-	hash := sha256.Sum256([]byte(promt))
-	return fmt.Sprintf("%x", hash)
+func encrypt(promt string, hashType string) string {
+	var result string
+	switch hashType {
+	case "sha256":
+		hash := sha256.Sum256([]byte(promt))
+		result = fmt.Sprintf("%x", hash)
+	case "sha384":
+		hash := sha512.Sum384([]byte(promt))
+		result = fmt.Sprintf("%x", hash)
+	case "sha512":
+		hash := sha512.Sum512([]byte(promt))
+		result = fmt.Sprintf("%x", hash)
+	default:
+		result = "Unknown hash type"
+	}
+	return result
 }
