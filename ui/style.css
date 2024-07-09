@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    text-align: center;
+}
+
+.choice-func, .hash-options, .text-fields, .history {
+    margin: 20px 0;
+}
+
+.func-button, .hash-button {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+}
+
+.func-button.active, .hash-button.active {
+    background-color: blue;
+    color: white;
+}
+
+.start-button {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.start-button:hover {
+    background-color: green;
+    color: white;
+}
+
+.input-container, .output-container {
+    display: inline-block;
+    vertical-align: top;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    resize: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 10px;
+}

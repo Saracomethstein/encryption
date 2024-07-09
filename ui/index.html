@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encryption/Decryption</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="choice-func">
+            <label>Choice func:</label>
+            <button id="encrypt" class="func-button" onclick="selectFunc('encrypt')">encrypt</button>
+            <button id="decrypt" class="func-button" onclick="selectFunc('decrypt')">decrypt</button>
+        </div>
+
+        <div class="hash-options">
+            <button id="sha256" class="hash-button" onclick="selectHash('sha256')">SHA256</button>
+            <button id="sha384" class="hash-button" onclick="selectHash('sha384')">SHA384</button>
+            <button id="sha512" class="hash-button" onclick="selectHash('sha512')">SHA512</button>
+            <button id="start" class="start-button" onclick="startProcess()">START</button>
+        </div>
+
+        <div class="text-fields">
+            <div class="input-container">
+                <label for="input">input</label>
+                <textarea id="input" rows="10" cols="50"></textarea>
+            </div>
+            <div class="output-container">
+                <label for="output">output</label>
+                <textarea id="output" rows="10" cols="50" readonly></textarea>
+            </div>
+        </div>
+
+        <div class="history">
+            <label>History</label>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Crypto</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    <!-- add history -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
