@@ -58,14 +58,13 @@ encryption/
 ├── server.go              # Main Go application
 ├── encrypt/               # Encryption logic
 │   └── encrypt.go
-├── decrypt/               # Decrypting logic
-│   └── decrypt.go
-├── ui/                    # Frontend files
-│   ├── index.html
-│   ├── style.css
-│   └── script.js
-└── list/
-    └── list.txt           # File to store key-value pairs for decryption
+├── database/               # Decrypting logic
+│   └── dbConnection.go
+└── ui/                    # Frontend files
+    ├── index.html
+    ├── style.css
+    └── script.js
+
 ```
 
 ## Contributing
