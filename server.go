@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	connection "encryption/database"
 	decrypt "encryption/decrypt"
 	encrypt "encryption/encrypt"
 	"log"
@@ -21,7 +22,7 @@ type Response struct {
 var db *sql.DB
 
 func main() {
-	db = setupDB()
+	db = connection.SetupDB()
 	defer db.Close()
 
 	http.Handle("/", http.FileServer(http.Dir("./ui")))
@@ -51,9 +52,7 @@ func encryptHandler(w http.ResponseWriter, r *http.Request) {
 		result = "Unknown hash type"
 	}
 
-	if !decrypt.ExistsInList(req.Text, result) {
-		addInList(req.Text, result)
-	}
+	connection.AddDataInDB(req.Text, result, *db)
 
 	res := Response{Result: result}
 	json.NewEncoder(w).Encode(res)
@@ -73,21 +72,4 @@ func decryptHandler(w http.ResponseWriter, r *http.Request) {
 
 	res := Response{Result: key}
 	json.NewEncoder(w).Encode(res)
-}
-
-func addInList(key string, hash string) {
-	var exists bool
-	query := `SELECT EXISTS(SELECT 1 FROM encryption_history WHERE key=$1 AND value=$2)`
-	err := db.QueryRow(query, key, hash).Scan(&exists)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if !exists {
-		query = `INSERT INTO encryption_history (key, value) VALUES ($1, $2)`
-		_, err := db.Exec(query, key, hash)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
 }

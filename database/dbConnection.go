@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"database/sql"
@@ -15,7 +15,7 @@ const (
 	dbname   = "encryption"
 )
 
-func setupDB() *sql.DB {
+func SetupDB() *sql.DB {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
