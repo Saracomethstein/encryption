@@ -1,13 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	decrypt "encryption/decrypt"
 	encrypt "encryption/encrypt"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 )
 
 type Request struct {
@@ -19,7 +18,12 @@ type Response struct {
 	Result string `json:"result"`
 }
 
+var db *sql.DB
+
 func main() {
+	db = setupDB()
+	defer db.Close()
+
 	http.Handle("/", http.FileServer(http.Dir("./ui")))
 
 	http.HandleFunc("/api/encrypt", encryptHandler)
@@ -48,7 +52,7 @@ func encryptHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !decrypt.ExistsInList(req.Text, result) {
-		addDataInList(req.Text, result)
+		addInList(req.Text, result)
 	}
 
 	res := Response{Result: result}
@@ -71,27 +75,19 @@ func decryptHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-func addDataInList(key string, hash string) {
-	var str string = fmt.Sprintf("%s  %s\n", key, hash)
-	file, err := os.OpenFile("list/list.txt", os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-
+func addInList(key string, hash string) {
+	var exists bool
+	query := `SELECT EXISTS(SELECT 1 FROM encryption_history WHERE key=$1 AND value=$2)`
+	err := db.QueryRow(query, key, hash).Scan(&exists)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
 
-	_, err = file.WriteString(str)
-
-	if err != nil {
-		fmt.Println(err)
-		file.Close()
-		return
-	}
-
-	err = file.Close()
-
-	if err != nil {
-		fmt.Println(err)
-		return
+	if !exists {
+		query = `INSERT INTO encryption_history (key, value) VALUES ($1, $2)`
+		_, err := db.Exec(query, key, hash)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
