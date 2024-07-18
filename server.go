@@ -1,14 +1,13 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
+	decrypt "encryption/decrypt"
 	encrypt "encryption/encrypt"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"strings"
 )
 
 type Request struct {
@@ -48,8 +47,8 @@ func encryptHandler(w http.ResponseWriter, r *http.Request) {
 		result = "Unknown hash type"
 	}
 
-	if !existsInList(req.Text, result) {
-		addInList(req.Text, result)
+	if !decrypt.ExistsInList(req.Text, result) {
+		addDataInList(req.Text, result)
 	}
 
 	res := Response{Result: result}
@@ -63,7 +62,7 @@ func decryptHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	key := findKeyByHash(req.Text)
+	key := decrypt.FindKeyByHash(req.Text)
 	if key == "" {
 		key = "Key not found"
 	}
@@ -72,7 +71,7 @@ func decryptHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-func addInList(key string, hash string) {
+func addDataInList(key string, hash string) {
 	var str string = fmt.Sprintf("%s  %s\n", key, hash)
 	file, err := os.OpenFile("list/list.txt", os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 
@@ -95,53 +94,4 @@ func addInList(key string, hash string) {
 		fmt.Println(err)
 		return
 	}
-}
-
-func existsInList(key string, hash string) bool {
-	file, err := os.Open("list/list.txt")
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	entry := fmt.Sprintf("%s  %s", key, hash)
-
-	for scanner.Scan() {
-		if scanner.Text() == entry {
-			return true
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		fmt.Println(err)
-	}
-
-	return false
-}
-
-func findKeyByHash(hash string) string {
-	file, err := os.Open("list/list.txt")
-	if err != nil {
-		fmt.Println(err)
-		return ""
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		parts := strings.Split(line, "  ")
-		if len(parts) == 2 && parts[1] == hash {
-			return parts[0]
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		fmt.Println(err)
-	}
-
-	return ""
 }

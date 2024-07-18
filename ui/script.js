@@ -43,7 +43,7 @@ function startProcess() {
 
 function addHistory(key, crypto) {
     const historyBody = document.getElementById('history-body');
-    const row = historyBody.insertRow();
+    const row = historyBody.insertRow(0);
     const cellKey = row.insertCell(0);
     const cellCrypto = row.insertCell(1);
 
