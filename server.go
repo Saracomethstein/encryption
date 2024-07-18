@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	connection "encryption/database"
-	decrypt "encryption/decrypt"
 	encrypt "encryption/encrypt"
 	"log"
 	"net/http"
@@ -52,7 +51,7 @@ func encryptHandler(w http.ResponseWriter, r *http.Request) {
 		result = "Unknown hash type"
 	}
 
-	connection.AddDataInDB(req.Text, result, *db)
+	AddDataInDB(req.Text, result)
 
 	res := Response{Result: result}
 	json.NewEncoder(w).Encode(res)
@@ -65,11 +64,39 @@ func decryptHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	key := decrypt.FindKeyByHash(req.Text)
+	key := FindKeyByHash(req.Text)
 	if key == "" {
 		key = "Key not found"
 	}
 
 	res := Response{Result: key}
 	json.NewEncoder(w).Encode(res)
+}
+
+func AddDataInDB(key string, hash string) {
+	var exists bool
+	query := `SELECT EXISTS(SELECT 1 FROM encryption_history WHERE key=$1 AND value=$2)`
+	err := db.QueryRow(query, key, hash).Scan(&exists)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if !exists {
+		query = `INSERT INTO encryption_history (key, value) VALUES ($1, $2)`
+		_, err := db.Exec(query, key, hash)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func FindKeyByHash(hash string) string {
+	var key string
+	err := db.QueryRow("SELECT key FROM encryption_history WHERE value = $1", hash).Scan(&key)
+	if err == sql.ErrNoRows {
+		return ""
+	} else if err != nil {
+		return ""
+	}
+	return key
 }
