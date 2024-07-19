@@ -12,7 +12,7 @@ This project is a web application that allows users to encrypt and decrypt text 
 
 ## Requirements
 
-- Go 1.14+
+- Go 1.22+
 - PostgreSQL 16
 - A web browser
 
