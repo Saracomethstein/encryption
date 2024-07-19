@@ -13,6 +13,7 @@ This project is a web application that allows users to encrypt and decrypt text 
 ## Requirements
 
 - Go 1.14+
+- PostgreSQL 16
 - A web browser
 
 ## Installation
@@ -27,7 +28,7 @@ cd encryption
 2. Run the Go application:
 
 ```bash
-go run server.go&
+make run
 ```
 
 The application will start on `http://localhost:8000`.
@@ -55,12 +56,15 @@ The application will start on `http://localhost:8000`.
 
 ```
 encryption/
-├── server.go              # Main Go application
-├── encrypt/               # Encryption logic
-│   └── encrypt.go
-├── database/               # Decrypting logic
+├── app/                    # Main Go application
+│   └── server.go
+├── database/               # Database connection and commands
 │   └── dbConnection.go
-└── ui/                    # Frontend files
+├── encrypt/                # Encryption logic
+│   └── encrypt.go
+├── materials/              # Database dump
+│   └── dbScrypt.sql
+└── ui/                     # Frontend files
     ├── index.html
     ├── style.css
     └── script.js
